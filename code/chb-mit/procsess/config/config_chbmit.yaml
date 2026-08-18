@@ -1,0 +1,28 @@
+# CHB-MIT 预处理配置文件
+preprocessing:
+  sampling_rate: 256
+  filter:
+    low_freq: 0.5
+    high_freq: 30.0
+    order: 4
+  notch:
+    freq: 50.0
+    quality_factor: 30
+  baseline:
+    duration: 0.2
+  outlier:
+    mad_threshold: 8.0
+  bad_trial:
+    min_variance: 1e-6
+    min_std: 1e-6
+
+chbmit:
+  window_duration: 4.0                 # 窗口长度（秒）
+  n_interictal_per_seizure: 2          # 每个发作窗口对应的间期窗口数
+  preictal_exclude: 0.0                # 发作前排除时间（秒）
+  postictal_exclude: 0.0               # 发作后排除时间（秒）
+  interictal_min_gap: 10.0             # 间期窗口与发作的最小间隔（秒）
+  seizure_window_step: 1.0             # 发作窗口滑动步长（秒），设为0则只取中心点
+
+similarity:
+  method: "pearson"

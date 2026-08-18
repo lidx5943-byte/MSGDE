@@ -1,0 +1,4 @@
+# 运行时间: 2025-11-27 01:09:58
+# 工作目录: /srv/wzh/mm_eeg/opt_code/scripts
+
+run_ml_convert.py --features dynamics_data.npy --trajectories trajectories.npy

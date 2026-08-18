@@ -1,0 +1,14 @@
+{
+  "name": "ml_data",
+  "description": "ML Data Conversion",
+  "timestamp": "20251127_010958",
+  "start_time": "2025-11-27 01:09:58",
+  "status": "running",
+  "inputs": {
+    "features": "/srv/wzh/mm_eeg/opt_code/scripts/dynamics_data.npy",
+    "trajectories": "/srv/wzh/mm_eeg/opt_code/scripts/trajectories.npy"
+  },
+  "outputs": {},
+  "log_file": "output/ml_data_20251127_010958/logs/experiment_20251127_010958.log",
+  "command": "run_ml_convert.py --features dynamics_data.npy --trajectories trajectories.npy"
+}

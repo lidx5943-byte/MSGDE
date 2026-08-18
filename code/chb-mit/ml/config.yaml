@@ -1,0 +1,45 @@
+# 机器学习训练配置文件
+
+# 输入数据路径
+input_data: "/mnt/gs21/scratch/jiangj33/ldx/case21/output/output-xyz-multi-3k-10scalech01/CHB-MIT-0.0/data/trajectories.npy"
+  
+
+# 标签数据路径
+label: "/mnt/gs21/scratch/jiangj33/ldx/case21/output_chb01_new/labels.npy"  # 形状为 
+
+# 选择的尺度K (0-9)
+scale_k: 0
+
+# n折交叉验证
+n_folds: 10
+
+# 实验名称
+experiment_name: "ml_experiment_xyz_all_0_0couple_sacle_CHB-MIT-0.0_scale0"
+
+# 输出路径
+output_path: "./results"
+
+# KNN参数调优范围
+knn_k_range: [1, 3, 5, 7, 9, 11, 15, 20]
+
+# 随机森林参数
+random_forest:
+  n_estimators: 100
+  max_depth: null  # 使用null表示无限制深度
+  random_state: 42
+
+# GBDT参数
+gbdt:
+  n_estimators: 100
+  learning_rate: 0.1
+  max_depth: 3
+  random_state: 42
+
+# SVM参数
+svm:
+  C: 1.0
+  kernel: "rbf"
+  gamma: "scale"
+  random_state: 42
+
+

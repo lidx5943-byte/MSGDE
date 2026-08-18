@@ -1,0 +1,269 @@
+# ==============================================================================
+# EEG动力学分析配置文件
+# ==============================================================================
+# 
+# 本配置文件包含所有分析参数，按功能模块分类组织。
+# 修改参数后重新运行相应脚本即可生效。
+#
+# 配置结构:
+#   1. paths - 数据路径配置
+#   2. preprocessing - 数据预处理参数
+#   3. similarity - 相似度计算参数
+#   4. laplacian - 拉普拉斯矩阵参数
+#   5. dynamics - 动力学分析参数
+#   6. visualization - 可视化参数
+#   7. output - 输出配置
+#
+# ==============================================================================
+
+# ==============================================================================
+# 1. 数据路径配置
+# ==============================================================================
+paths:
+  # 原始数据目录
+  data_dir: "/srv/wzh/mm_eeg/data"
+  
+  # 预处理数据
+  motor_data: "/srv/wzh/mm_eeg/data/motor_data.npy"
+  imagery_data: "/srv/wzh/mm_eeg/data/imagery_data.npy"
+  metadata: "/srv/wzh/mm_eeg/data/metadata.npy"
+  
+  # 清理后数据
+  clean_data: "/srv/wzh/mm_eeg/data/chbmit_training_data.npy"
+  labels: "/srv/wzh/mm_eeg/data/chbmit_training_data_labels.npy"
+  
+  # 相似度矩阵
+  correlation_dir: "corr"
+  correlation_file: "pearson.npy"
+  
+  # 拉普拉斯矩阵
+  laplacian_dir: "pl_data"
+  laplacian_family: "laplacian_family.npy"
+  
+  # 动力学分析输出
+  dynamics_dir: "dynamics"
+  
+  # 特征数据
+  features_dir: "features"
+  
+  # 机器学习数据路径
+  ml:
+    # 传统ML数据路径（从ML数据转换步骤生成）
+    ml_data_dir: "ml"              # ML数据目录（相对于实验输出目录）
+    ml_features: ""  # 特征矩阵文件名
+    ml_labels: ""     # 标签文件名
+    ml_all_data: "all_data.npy"   # 合并数据文件名
+    
+    # Transformer数据路径
+    transformer_data_dir: "transformer"  # Transformer数据目录
+    transformer_features: "X_transformer.npy"  # Transformer特征文件名
+    transformer_labels: "y_labels.npy"   # Transformer标签文件名
+    
+    # 分类结果路径
+    classification_dir: "ml_classification"  # 分类结果目录
+
+# ==============================================================================
+# 2. 数据预处理参数
+# ==============================================================================
+preprocessing:
+  # 采样率 (Hz)
+  sampling_rate: 256
+  
+  # 带通滤波参数
+  filter:
+    low_freq: 8.0           # 下截止频率 (Hz) - α频段下限
+    high_freq: 12.5         # 上截止频率 (Hz) - α频段上限
+    order: 4                # Butterworth滤波器阶数
+  
+  # 陷波滤波参数 (去除工频干扰)
+  notch:
+    freq: 50.0              # 陷波频率 (Hz)
+    quality_factor: 30      # Q因子
+  
+  # 基线校正参数
+  baseline:
+    duration: 0.2           # 基线时长 (秒)
+  
+  # 异常值处理参数 (MAD方法)
+  outlier:
+    mad_threshold: 8.0      # MAD阈值倍数
+  
+  # 坏trial检测参数
+  bad_trial:
+    min_variance: 1.0e-6    # 最小方差阈值
+    min_std: 1.0e-6         # 最小标准差
+
+# ==============================================================================
+# 3. 相似度计算参数
+# ==============================================================================
+similarity:
+  # 相似度方法: pearson, spearman, cosine, rbf_kernel, laplacian_kernel
+  method: "pearson"
+  
+  # RBF核参数
+  rbf_gamma: "scale"        # 'scale' 或具体数值
+  
+  # 拉普拉斯核参数
+  laplacian_gamma: 1.0
+
+# ==============================================================================
+# 4. 拉普拉斯矩阵参数
+# ==============================================================================
+laplacian:
+  # 多尺度数量
+  n_scales: 5
+  
+  # 权重参数 (距离转权重)
+  sigma: 3.0                # 尺度参数
+  k: 1                      # 指数参数，用于计算 A_ij = 1 - exp(-d_ij^k / sigma^k)
+
+# ==============================================================================
+# 5. 动力学分析参数
+# ==============================================================================
+dynamics:
+  # 振荡器参数 (Lorenz系统)
+  oscillator:
+    type: "Lorenz"
+    alpha: 10.0             # σ参数
+    beta: 2.666666          # β参数 (8/3)
+    gamma: 60.0             # ρ参数
+    rk: 7.0                 # 周期性边界耦合系数
+  
+  # 数值积分参数
+  numerical:
+    method: "RK4"         # 求解方法: Euler, RK4
+    time_step: 1.0e-3       # 时间步长 h
+    coupling_strength: 0.42 # 耦合强度 ε
+    coupling_mode: "x_only" # 耦合模式: x_only(全局网络x方向耦合), xyz_all(3分量直积单位矩阵耦合), nearest_neighbor(最近邻扩散耦合)
+    use_periodic_boundary: true  # 是否使用周期性边界
+  
+  # 分析参数
+  analysis:
+    n_scales: 5             # 分析的尺度数量
+    time_steps: 12000    # 总时间步数
+    transient_steps: 2000 # 暂态步数 (丢弃)
+    max_nodes: 4600         # 每尺度最大节点数
+  
+  # 采样参数
+  sampling:
+    method: "hybrid"        # 采样方法: random, uniform, hybrid
+    hybrid_ratio: 0.3       # 混合采样中随机采样比例
+  
+  # 特征提取参数
+  features:
+    enable_chaos: true   # 是否提取混沌特征（Lyapunov指数）
+    enable_sync: true       # 是否提取同步特征（与中心节点的相关系数）
+  
+  # 初始值范围
+  initial_values:
+    x_min: -10.0
+    x_max: 10.0
+    y_min: -10.0
+    y_max: 10.0
+    z_min: 0.0
+    z_max: 50.0
+  
+  # 数值稳定性控制
+  stability:
+    state_clip_min: -200.0
+    state_clip_max: 200.0
+    dynamics_clip_min: -5000.0
+    dynamics_clip_max: 5000.0
+
+# ==============================================================================
+# 6. 可视化参数
+# ==============================================================================
+visualization:
+  # 轨迹图参数
+  trajectory:
+    interval_mode: "uniform"  # uniform 或 custom
+    uniform_interval: 300     # 均匀间隔步数
+    custom_intervals: [50, 50, 100, 100, 200, 200, 500, 500, 1000]
+    window_size: 100          # 窗口大小 (null表示累积模式)
+  
+  # 特征差异性分析
+  feature_diversity:
+    enable: true
+    step_interval: 1000
+    method: "combined"        # std, frobenius, mean_distance, variance, entropy, combined
+    n_scales: 1
+    center_node_idx: 0
+  
+  # 图像参数
+  figure:
+    dpi: 300
+    format: "png"
+
+# ==============================================================================
+# 7. 输出配置
+# ==============================================================================
+output:
+  # 基础输出目录
+  base_dir: "output"
+  
+  # 是否使用时间戳创建子目录
+  use_timestamp: true
+  
+  # 子目录结构
+  subdirs:
+    logs: "logs"
+    data: "data"
+    figures: "figures"
+    reports: "reports"
+  
+  # 日志配置
+  logging:
+    level: "INFO"
+    save_to_file: true
+
+# ==============================================================================
+# 8. 并行处理参数
+# ==============================================================================
+parallel:
+  n_jobs: -1                # CPU核心数: -1表示使用所有核心
+  max_jobs: 8               # 最大核心数限制
+
+# ==============================================================================
+# 9. 机器学习分类参数
+# ==============================================================================
+ml:
+  # 数据转换参数
+  data_conversion:
+    shuffle: true                 # 是否打乱数据
+    random_state: 42             # 随机种子
+  
+  # 分类评估参数
+  classification:
+    # 交叉验证参数
+    cv_folds: 10                 # 交叉验证折数
+    random_state: 42             # 随机种子
+    
+    # KNN分类器参数
+    knn:
+      k: 5                        # 邻居数量
+      weights: "uniform"          # 权重: uniform 或 distance
+      algorithm: "auto"           # 算法: auto, ball_tree, kd_tree, brute
+    
+    # 随机森林分类器参数
+    random_forest:
+      n_estimators: 100           # 树的数量
+      max_depth: null             # 最大深度 (null表示不限制)
+      min_samples_split: 2        # 分裂所需最小样本数
+      min_samples_leaf: 1         # 叶节点最小样本数
+      max_features: "sqrt"        # 特征选择: sqrt, log2, null
+      bootstrap: true             # 是否使用bootstrap采样
+    
+    # 类别名称映射（可选，用于混淆矩阵显示）
+    # 如果数据中的类别标签是数字，可以映射为有意义的名称
+    class_names:
+      # 0: "Motor"                 # 示例：类别0映射为"Motor"
+      # 1: "Imagery"               # 示例：类别1映射为"Imagery"
+      # 如果不需要映射，可以注释掉或删除这部分
+    
+    # 输出配置
+    output:
+      save_figures: true          # 是否保存混淆矩阵图
+      save_report: true           # 是否保存分类报告
+      figure_format: "png"        # 图片格式
+      figure_dpi: 300             # 图片分辨率
+
