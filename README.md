@@ -132,7 +132,13 @@ Each graph node is assigned a **Lorenz oscillator**:
 
 ```math
 \dot{x} = \sigma (y - x)
+```
+
+```math
 \dot{y} = x (\rho - z) - y
+```
+
+```math
 \dot{z} = x y - \beta z
 ```
 
