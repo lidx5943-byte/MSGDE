@@ -70,7 +70,7 @@ These datasets consist of fixed‑length EEG epochs that are already pre‑segme
 
 - Bonn: 500 samples, each of length 4,096 points (≈23.6 s), single channel.
 
-- New Delhi: 450 samples, each of length 512 points (≈2.56 s), 4 or 16 channels (depending on version). For consistency, only the first 4 channels are used (or all available channels are flattened).
+- New Delhi: 150 samples, each of length 512 points (≈2.56 s), single‑channel EEG recordings.
 
 ## 2.2 CHB‑MIT Dataset
 Continuous scalp EEG recordings from 23 patients were preprocessed as follows:
@@ -236,12 +236,9 @@ MSGDE/
 │   └── opt_code/
 ├── photo/
 ├── similarity/
-│   ├── Bonn/
-│   │   └── similarity/
+│   ├── bonn/
 │   ├── chb-mit/
-│   │   └── similarity/
 │   └── newdelhi/
-│       └── similarity/
 ├── supporting_information/
 │   └── complete_result.xlsx
 └── README.md
